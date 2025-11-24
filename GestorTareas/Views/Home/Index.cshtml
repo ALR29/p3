@@ -10,6 +10,11 @@
 
     <div class="row mt-4">
         <div class="col-md-12">
+            <div class="mb-3 text-end">
+                <a asp-action="Crear" class="btn btn-primary">
+                    + Nueva Tarea
+                </a>
+            </div>
             <table class="table table-bordered table-striped">
                 <thead class="thead-dark">
                     <tr>
@@ -28,7 +33,7 @@
                 }
                 else
                 {
-                    /* CORRECCIÓN AQUÍ: Quitamos la @ antes del foreach */
+                    /* --- AQUÍ ESTABA EL ERROR: FALTABA EL FOREACH --- */
                     foreach (var tarea in Model)
                     {
                     <tr>
