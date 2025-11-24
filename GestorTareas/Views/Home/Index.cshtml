@@ -4,67 +4,91 @@
     ViewData["Title"] = "Mis Tareas";
     }
 
-    <div class="text-center">
-        <h1 class="display-4">Mis Tareas</h1>
-    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-10">
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="mb-3 text-end">
-                <a asp-action="Crear" class="btn btn-primary">
-                    + Nueva Tarea
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-6 fw-bold text-primary">
+                        <i class="bi bi-list-task"></i> Mis Tareas
+                    </h1>
+                    <p class="text-muted">Organiza tu día de forma eficiente</p>
+                </div>
+                <a asp-action="Crear" class="btn btn-primary btn-lg shadow-sm rounded-pill px-4">
+                    <i class="bi bi-plus-lg"></i> Nueva Tarea
                 </a>
             </div>
-            <table class="table table-bordered table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Tarea</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Count == 0)
-                {
-                    <tr>
-                        <td colspan="4" class="text-center">No hay tareas pendientes.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var tarea in Model)
-                    {
-                <tr>
-                    <td>@tarea.Id</td>
-                    <td>@tarea.Titulo</td>
-                    <td>
-                        @if(tarea.EstaCompletada)
-                                {
-                        <span class="badge bg-success">Completada</span>
-                                }
-                                else
-                                {
-                        <span class="badge bg-warning text-dark">Pendiente</span>
-                                }
-                    </td>
-                   
-                    <td>
-                        <a asp-action="Completar" asp-route-id="@tarea.Id"
-                           class="btn btn-sm @(tarea.EstaCompletada ? "btn-secondary" : "btn-success")">
-                            @(tarea.EstaCompletada ? "Desmarcar" : "Completar")
-                        </a>
 
-                        <a asp-action="Eliminar" asp-route-id="@tarea.Id"
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('¿Seguro que deseas eliminar esta tarea?');">
-                            Eliminar
-                        </a>
-                    </td>
-                </tr>
-                    }
-                }
-                </tbody>
-            </table>
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light text-secondary">
+                            <tr>
+                                <th class="ps-4 py-3">#</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-emoji-smile display-4 mb-3 d-block"></i>
+                                        <h5>¡No hay tareas pendientes!</h5>
+                                        <p>Agrega una nueva tarea para comenzar.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var tarea in Model)
+                            {
+                            <tr class="@(tarea.EstaCompletada ? "bg-light" : "")">
+                                <td class="ps-4 fw-bold text-muted">@tarea.Id</td>
+
+                                <td class="@(tarea.EstaCompletada ? "text-decoration-line-through text-muted fst-italic" : "fw-bold text-dark")">
+                                    @tarea.Titulo
+                                </td>
+
+                                <td>
+                                    @if(tarea.EstaCompletada)
+                                        {
+                                    <span class="badge rounded-pill bg-success bg-opacity-75">
+                                        <i class="bi bi-check-circle-fill"></i> Completada
+                                    </span>
+                                        }
+                                        else
+                                        {
+                                    <span class="badge rounded-pill bg-warning text-dark">
+                                        <i class="bi bi-hourglass-split"></i> Pendiente
+                                    </span>
+                                        }
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    <a asp-action="Completar" asp-route-id="@tarea.Id"
+                                       class="btn btn-sm me-1 rounded-circle @(tarea.EstaCompletada ? "btn-outline-secondary" : "btn-success")"
+                                       title="@(tarea.EstaCompletada ? "Reabrir" : "Completar")">
+                                        <i class="bi @(tarea.EstaCompletada ? "bi-arrow-counterclockwise" : "bi-check-lg")"></i>
+                                    </a>
+
+                                    <a asp-action="Eliminar" asp-route-id="@tarea.Id"
+                                       class="btn btn-sm btn-outline-danger rounded-circle"
+                                       onclick="return confirm('¿Eliminar esta tarea?');"
+                                       title="Eliminar">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
