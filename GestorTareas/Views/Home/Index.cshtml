@@ -35,26 +35,33 @@
                 {
                     foreach (var tarea in Model)
                     {
-                    <tr>
-                        <td>@tarea.Id</td>
-                        <td>@tarea.Titulo</td>
-                        <td>
-                            @if(tarea.EstaCompletada)
+                <tr>
+                    <td>@tarea.Id</td>
+                    <td>@tarea.Titulo</td>
+                    <td>
+                        @if(tarea.EstaCompletada)
                                 {
-                            <span class="badge bg-success">Completada</span>
+                        <span class="badge bg-success">Completada</span>
                                 }
                                 else
                                 {
-                            <span class="badge bg-warning text-dark">Pendiente</span>
+                        <span class="badge bg-warning text-dark">Pendiente</span>
                                 }
-                        </td>
-                        <td>
-                            <a asp-action="Completar" asp-route-id="@tarea.Id"
-                               class="btn btn-sm @(tarea.EstaCompletada ? "btn-secondary" : "btn-success")">
-                                @(tarea.EstaCompletada ? "Desmarcar" : "Completar")
-                            </a>
-                        </td>
-                    </tr>
+                    </td>
+                   
+                    <td>
+                        <a asp-action="Completar" asp-route-id="@tarea.Id"
+                           class="btn btn-sm @(tarea.EstaCompletada ? "btn-secondary" : "btn-success")">
+                            @(tarea.EstaCompletada ? "Desmarcar" : "Completar")
+                        </a>
+
+                        <a asp-action="Eliminar" asp-route-id="@tarea.Id"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('¿Seguro que deseas eliminar esta tarea?');">
+                            Eliminar
+                        </a>
+                    </td>
+                </tr>
                     }
                 }
                 </tbody>
