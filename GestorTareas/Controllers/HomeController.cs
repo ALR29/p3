@@ -1,31 +1,22 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using GestorTareas.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
-namespace GestorTareas.Controllers;
-
-public class HomeController : Controller
+namespace GestorTareas.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    public class HomeController : Controller
     {
-        _logger = logger;
-    }
+        // Simulamos la base de datos con una lista estática
+        private static List<Tarea> tareas = new List<Tarea>();
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+        public IActionResult Index()
+        {
+            return View(tareas); // Pasamos la lista a la vista
+        }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        public IActionResult Privacy()
+        {
+            return View();
+        }
     }
 }
