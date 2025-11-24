@@ -20,6 +20,16 @@ namespace GestorTareas.Controllers
         }
 
         // --- AQUI ESTÁN LOS MÉTODOS NUEVOS ---
+        public IActionResult Completar(int id)
+        {
+            var tarea = tareas.FirstOrDefault(t => t.Id == id);
+            if (tarea != null)
+            {
+                // Invertimos el valor: si es true pasa a false, y viceversa
+                tarea.EstaCompletada = !tarea.EstaCompletada;
+            }
+            return RedirectToAction("Index");
+        }
 
         // GET: Muestra el formulario
         public IActionResult Crear()
