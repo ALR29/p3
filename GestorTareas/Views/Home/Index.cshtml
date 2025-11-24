@@ -33,7 +33,6 @@
                 }
                 else
                 {
-                    /* --- AQUÍ ESTABA EL ERROR: FALTABA EL FOREACH --- */
                     foreach (var tarea in Model)
                     {
                     <tr>
@@ -50,7 +49,10 @@
                                 }
                         </td>
                         <td>
-                            <span class="text-muted">Próximamente</span>
+                            <a asp-action="Completar" asp-route-id="@tarea.Id"
+                               class="btn btn-sm @(tarea.EstaCompletada ? "btn-secondary" : "btn-success")">
+                                @(tarea.EstaCompletada ? "Desmarcar" : "Completar")
+                            </a>
                         </td>
                     </tr>
                     }
