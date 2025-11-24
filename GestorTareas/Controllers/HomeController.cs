@@ -55,5 +55,16 @@ namespace GestorTareas.Controllers
             }
             return View(nuevaTarea);
         }
+
+        // ACCIÓN: Eliminar una tarea de la lista
+        public IActionResult Eliminar(int id)
+        {
+            var tarea = tareas.FirstOrDefault(t => t.Id == id);
+            if (tarea != null)
+            {
+                tareas.Remove(tarea);
+            }
+            return RedirectToAction("Index");
+        }
     }
 }
