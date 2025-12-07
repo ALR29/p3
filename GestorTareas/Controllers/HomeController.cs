@@ -1,3 +1,4 @@
+using GestorTareas.Data;
 using GestorTareas.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -6,63 +7,106 @@ namespace GestorTareas.Controllers
 {
     public class HomeController : Controller
     {
-        // Simulamos la base de datos con una lista estática
-        private static List<Tarea> tareas = new List<Tarea>();
+        // Esta es la conexión a la base de datos
+        private readonly AppDbContext _context;
 
-        public IActionResult Index()
+        public HomeController(AppDbContext context)
         {
-            return View(tareas);
+            _context = context;
         }
 
-        public IActionResult Privacy()
+        // GET: Index
+        public IActionResult Index(string buscar, Prioridad? filtroPrioridad, bool? mostrarCompletadas)
         {
-            return View();
-        }
+         
+            var query = _context.Tareas.AsQueryable();
 
-        // --- AQUI ESTÁN LOS MÉTODOS NUEVOS ---
-        public IActionResult Completar(int id)
-        {
-            var tarea = tareas.FirstOrDefault(t => t.Id == id);
-            if (tarea != null)
+            if (!string.IsNullOrEmpty(buscar))
             {
-                // Invertimos el valor: si es true pasa a false, y viceversa
-                tarea.EstaCompletada = !tarea.EstaCompletada;
+                query = query.Where(t => t.Titulo.Contains(buscar));
             }
-            return RedirectToAction("Index");
+
+            if (filtroPrioridad.HasValue)
+            {
+                query = query.Where(t => t.NivelPrioridad == filtroPrioridad.Value);
+            }
+
+            if (mostrarCompletadas.HasValue && mostrarCompletadas.Value == false)
+            {
+                query = query.Where(t => !t.EstaCompletada);
+            }
+
+            var lista = query
+                .OrderBy(t => t.EstaCompletada)
+                .ThenByDescending(t => t.FechaVencimiento)
+                .ThenByDescending(t => t.NivelPrioridad)
+                .ToList();
+
+            ViewBag.Buscar = buscar;
+            ViewBag.Prioridad = filtroPrioridad;
+            ViewBag.MostrarCompletadas = mostrarCompletadas;
+
+            return View(lista);
         }
 
-        // GET: Muestra el formulario
         public IActionResult Crear()
         {
             return View();
         }
 
-        // POST: Recibe los datos del formulario
         [HttpPost]
         public IActionResult Crear(Tarea nuevaTarea)
         {
             if (ModelState.IsValid)
             {
-                // Generar un ID simulado (auto-incrementable)
-                // Si la lista está vacía, el ID es 1. Si no, tomamos el último ID y sumamos 1.
-                int nuevoId = tareas.Count > 0 ? tareas.Max(t => t.Id) + 1 : 1;
-
-                nuevaTarea.Id = nuevoId;
-                nuevaTarea.EstaCompletada = false; // Por defecto no está completa
-
-                tareas.Add(nuevaTarea);
+               
+                nuevaTarea.EstaCompletada = false;
+                _context.Tareas.Add(nuevaTarea);
+                _context.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(nuevaTarea);
         }
 
-        // ACCIÓN: Eliminar una tarea de la lista
-        public IActionResult Eliminar(int id)
+        public IActionResult Editar(int id)
         {
-            var tarea = tareas.FirstOrDefault(t => t.Id == id);
+          
+            var tarea = _context.Tareas.Find(id);
+            if (tarea == null) return NotFound();
+            return View(tarea);
+        }
+
+        [HttpPost]
+        public IActionResult Editar(Tarea tareaEditada)
+        {
+            if (ModelState.IsValid)
+            {
+               
+                _context.Tareas.Update(tareaEditada);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(tareaEditada);
+        }
+
+        public IActionResult Completar(int id)
+        {
+            var tarea = _context.Tareas.Find(id);
             if (tarea != null)
             {
-                tareas.Remove(tarea);
+                tarea.EstaCompletada = !tarea.EstaCompletada;
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Eliminar(int id)
+        {
+            var tarea = _context.Tareas.Find(id);
+            if (tarea != null)
+            {
+                _context.Tareas.Remove(tarea);
+                _context.SaveChanges();
             }
             return RedirectToAction("Index");
         }

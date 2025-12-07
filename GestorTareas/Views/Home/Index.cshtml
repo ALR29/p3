@@ -1,94 +1,129 @@
 ﻿@model List<GestorTareas.Models.Tarea>
 
-    @{
-    ViewData["Title"] = "Mis Tareas";
-    }
+    @{ ViewData["Title"] = "Mis Tareas"; }
 
-    <div class="row justify-content-center">
-        <div class="col-md-10">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-primary"><i class="bi bi-list-check"></i> Mis Tareas</h2>
+            <a asp-action="Crear" class="btn btn-primary shadow-sm"><i class="bi bi-plus-lg"></i> Nueva Tarea</a>
+        </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="display-6 fw-bold text-primary">
-                        <i class="bi bi-list-task"></i> Mis Tareas
-                    </h1>
-                    <p class="text-muted">Organiza tu día de forma eficiente</p>
-                </div>
-                <a asp-action="Crear" class="btn btn-primary btn-lg shadow-sm rounded-pill px-4">
-                    <i class="bi bi-plus-lg"></i> Nueva Tarea
-                </a>
+        <div class="card mb-4 bg-light border-0">
+            <div class="card-body py-2">
+                <form method="get" asp-action="Index" class="row g-2 align-items-center">
+                    <div class="col-md-4">
+                        <input type="text" name="buscar" class="form-control" placeholder="🔍 Buscar por título..." value="@ViewBag.Buscar">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="filtroPrioridad" class="form-select" asp-items="Html.GetEnumSelectList<GestorTareas.Models.Prioridad>()">
+                            <option value="">-- Todas las Prioridades --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check form-switch pt-1">
+                            <input class="form-check-input" type="checkbox" id="chkCompletadas" name="mostrarCompletadas" value="true" @(ViewBag.MostrarCompletadas == true ? "checked" : "")>
+                            <label class="form-check-label" for="chkCompletadas">Mostrar Completadas</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button type="submit" class="btn btn-secondary w-100">Filtrar</button>
+                    </div>
+                </form>
             </div>
+        </div>
 
-            <div class="card shadow border-0 rounded-3">
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="bg-light text-secondary">
-                            <tr>
-                                <th class="ps-4 py-3">#</th>
-                                <th>Descripción</th>
-                                <th>Estado</th>
-                                <th class="text-end pe-4">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.Count == 0)
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Prioridad</th>
+                            <th>Tarea</th>
+                            <th>Vencimiento</th>
+                            <th>Estado</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count == 0)
+                    {
+                        <tr><td colspan="5" class="text-center py-4 text-muted">No se encontraron tareas con estos filtros.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var tarea in Model)
                         {
-                            <tr>
-                                <td colspan="4" class="text-center py-5">
-                                    <div class="text-muted">
-                                        <i class="bi bi-emoji-smile display-4 mb-3 d-block"></i>
-                                        <h5>¡No hay tareas pendientes!</h5>
-                                        <p>Agrega una nueva tarea para comenzar.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            foreach (var tarea in Model)
-                            {
-                            <tr class="@(tarea.EstaCompletada ? "bg-light" : "")">
-                                <td class="ps-4 fw-bold text-muted">@tarea.Id</td>
+                            // Lógica visual para Vencimiento (HU-10)
+                            bool estaVencida = tarea.FechaVencimiento.HasValue && tarea.FechaVencimiento.Value.Date < DateTime.Now.Date && !tarea.EstaCompletada;
+                            string claseFila = tarea.EstaCompletada ? "table-light text-muted" : "";
 
-                                <td class="@(tarea.EstaCompletada ? "text-decoration-line-through text-muted fst-italic" : "fw-bold text-dark")">
-                                    @tarea.Titulo
-                                </td>
+                        <tr class="@claseFila">
+                            <td>
+                                @switch (tarea.NivelPrioridad)
+                                    {
+                                        case GestorTareas.Models.Prioridad.Alta:
+                                <span class="badge bg-danger">Alta</span>
+                                            break;
+                                        case GestorTareas.Models.Prioridad.Media:
+                                <span class="badge bg-warning text-dark">Media</span>
+                                            break;
+                                        case GestorTareas.Models.Prioridad.Baja:
+                                <span class="badge bg-success">Baja</span>
+                                            break;
+                                    }
+                            </td>
 
-                                <td>
-                                    @if(tarea.EstaCompletada)
+                            <td>
+                                <span class="fw-bold @(tarea.EstaCompletada ? "text-decoration-line-through" : "")">@tarea.Titulo</span>
+                                @if (!string.IsNullOrEmpty(tarea.Descripcion))
+                                    {
+                                <div class="small text-muted text-truncate" style="max-width: 250px;">@tarea.Descripcion</div>
+                                    }
+                            </td>
+
+                            <td>
+                                @if (tarea.FechaVencimiento.HasValue)
+                                    {
+                                        if (estaVencida)
                                         {
-                                    <span class="badge rounded-pill bg-success bg-opacity-75">
-                                        <i class="bi bi-check-circle-fill"></i> Completada
-                                    </span>
+                                <span class="text-danger fw-bold"><i class="bi bi-exclamation-circle"></i> @tarea.FechaVencimiento.Value.ToShortDateString()</span>
                                         }
                                         else
                                         {
-                                    <span class="badge rounded-pill bg-warning text-dark">
-                                        <i class="bi bi-hourglass-split"></i> Pendiente
-                                    </span>
+                                <span>@tarea.FechaVencimiento.Value.ToShortDateString()</span>
                                         }
-                                </td>
+                                    }
+                                    else
+                                    {
+                                <span class="text-muted small">-</span>
+                                    }
+                            </td>
 
-                                <td class="text-end pe-4">
-                                    <a asp-action="Completar" asp-route-id="@tarea.Id"
-                                       class="btn btn-sm me-1 rounded-circle @(tarea.EstaCompletada ? "btn-outline-secondary" : "btn-success")"
-                                       title="@(tarea.EstaCompletada ? "Reabrir" : "Completar")">
-                                        <i class="bi @(tarea.EstaCompletada ? "bi-arrow-counterclockwise" : "bi-check-lg")"></i>
-                                    </a>
+                            <td>
+                                @if(tarea.EstaCompletada)
+                                    { <span class="badge rounded-pill bg-secondary">Completada</span> }
+                                    else
+                                    { <span class="badge rounded-pill bg-primary">Pendiente</span> }
+                            </td>
 
-                                    <a asp-action="Eliminar" asp-route-id="@tarea.Id"
-                                       class="btn btn-sm btn-outline-danger rounded-circle"
-                                       onclick="return confirm('¿Eliminar esta tarea?');"
-                                       title="Eliminar">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            }
+                            <td class="text-end pe-3">
+                                <a asp-action="Completar" asp-route-id="@tarea.Id" class="btn btn-sm btn-outline-success border-0" title="Marcar/Desmarcar">
+                                    <i class="bi @(tarea.EstaCompletada ? "bi-arrow-counterclockwise" : "bi-check-circle-fill") fs-5"></i>
+                                </a>
+
+                                <a asp-action="Editar" asp-route-id="@tarea.Id" class="btn btn-sm btn-outline-warning border-0" title="Editar">
+                                    <i class="bi bi-pencil-square fs-5"></i>
+                                </a>
+
+                                <a asp-action="Eliminar" asp-route-id="@tarea.Id" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('¿Borrar tarea?');" title="Eliminar">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </a>
+                            </td>
+                        </tr>
                         }
-                        </tbody>
-                    </table>
-                </div>
+                    }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

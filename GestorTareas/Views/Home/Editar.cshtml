@@ -1,23 +1,22 @@
 @model GestorTareas.Models.Tarea
-@{ ViewData["Title"] = "Nueva Tarea"; }
+@{ ViewData["Title"] = "Editar Tarea"; }
 
 <div class="row justify-content-center mt-4">
     <div class="col-md-8">
         <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-warning text-dark">
                 <span asp-validation-for="Titulo" class="text-danger"></span>
-                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nueva Tarea</h4>
+                <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Editar Tarea</h4>
             </div>
             <div class="card-body">
-                <form asp-action="Crear" method="post">
-
-                    <div class="mb-3">
+                <form asp-action="Editar" method="post">
+                    <input type="hidden" asp-for="Id" /> <input type="hidden" asp-for="EstaCompletada" /> <div class="mb-3">
                         <label asp-for="Titulo" class="form-label fw-bold">Título</label>
-                        <input asp-for="Titulo" class="form-control" placeholder="Ej: Entregar Proyecto Final" required />
+                        <input asp-for="Titulo" class="form-control" required />
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Descripcion" class="form-label">Descripción (Opcional)</label>
+                        <label asp-for="Descripcion" class="form-label">Descripción</label>
                         <textarea asp-for="Descripcion" class="form-control" rows="2"></textarea>
                     </div>
 
@@ -36,7 +35,7 @@
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
                         <a asp-action="Index" class="btn btn-light me-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary px-4">Guardar Tarea</button>
+                        <button type="submit" class="btn btn-warning px-4">Guardar Cambios</button>
                     </div>
                 </form>
             </div>
